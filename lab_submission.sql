@@ -17,3 +17,9 @@ CURRENT_TIMESTAMP),
 `customer_service_ticket_last_update` = CONCAT('The last 1-minute recurring update was made at ', CURRENT_TIMESTAMP)
 WHERE
 `customer_service_ticket_resolved` = 0;
+
+--creating 'customer_service_kpi'
+CREATE TABLE `customer_service_kpi` (
+`customer_service_KPI_timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`customer_service_KPI_average_waiting_time_minutes` INT NOT NULL,
+PRIMARY KEY (`customer_service_KPI_timestamp`));
