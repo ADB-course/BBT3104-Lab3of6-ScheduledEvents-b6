@@ -1,9 +1,19 @@
 -- CREATE EVN_average_customer_waiting_time_every_1_hour
-CREATE TABLE EVN_average_customer_waiting_time_every_1_hour (
-    entity_id INT PRIMARY KEY, 
-    timestamp TIMESTAMP NOT NULL, 
-    average_waiting_time DECIMAL(10, 2) NOT NULL 
-);
-
-INSERT INTO EVN_average_customer_waiting_time_every_1_hour (entity_id, timestamp, average_waiting_time)
-VALUES (1, '2024-09-28 10:00:00', 0.25); -- Average waiting time of 15 minutes for entity 1 at 10 AM
+CREATE EVENT EVN_average_customer_waiting_time_every_1_hour
+ON
+SCHEDULE EVERY 1 HOUR
+STARTS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
+ENDS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
+ON
+COMPLETION PRESERVE
+COMMENT 'This event computes the total time a customer has waited since they raised a ticket'
+DO
+UPDATE
+`customer_service_ticket`
+SET
+`customer_service_total_wait_time_minutes` = TIMESTAMPDIFF(MINUTE,
+`customer_service_ticket_raise_time`,
+CURRENT_TIMESTAMP),
+`customer_service_ticket_last_update` = CONCAT('The last 1-minute recurring update was made at ', CURRENT_TIMESTAMP)
+WHERE
+`customer_service_ticket_resolved` = 0;
